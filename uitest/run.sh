@@ -2,12 +2,14 @@
 # Drives the DS Admin app on an emulator and captures screenshots.
 APK="$1"; OUT="$2"; PKG=com.digitalseba.admin
 mkdir -p "$OUT"
-shot() { sleep "${2:-2}"; adb exec-out screencap -p > "$OUT/$1.png"; echo "shot $1"; }
+shot() { sleep "${2:-2}"; python3 uitest/ui.py noop >/dev/null; adb exec-out screencap -p > "$OUT/$1.png"; echo "shot $1"; }
 ui() { python3 uitest/ui.py "$@"; }
 back() { adb shell input keyevent KEYCODE_BACK; sleep 2; }
 
 adb install -r "$APK" || exit 1
 adb root; sleep 4
+adb shell pm disable-user --user 0 com.google.android.apps.nexuslauncher || true
+adb shell settings put secure anr_show_background 0 || true
 adb shell pm grant $PKG android.permission.POST_NOTIFICATIONS || true
 adb shell settings put global window_animation_scale 0
 adb shell settings put global transition_animation_scale 0

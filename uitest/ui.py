@@ -9,7 +9,13 @@ def nodes():
         sh('shell', 'uiautomator', 'dump', '/sdcard/ui.xml')
         x = sh('shell', 'cat', '/sdcard/ui.xml')
         if '<hierarchy' in x:
-            return list(ET.fromstring(x[x.index('<hierarchy'):]).iter('node'))
+            ns = list(ET.fromstring(x[x.index('<hierarchy'):]).iter('node'))
+            anr = [n for n in ns if "isn't responding" in (n.get('text') or '')]
+            if anr:
+                w = [n for n in ns if n.get('text') in ('Wait', 'Close app')]
+                if w:
+                    tap(*center(w[0])); time.sleep(1.5); continue
+            return ns
         time.sleep(1)
     return []
 
@@ -52,6 +58,8 @@ if __name__ == '__main__':
             print('typed into', idx)
         else:
             print('no edit', idx, len(eds))
+    elif cmd == 'noop':
+        nodes()
     elif cmd == 'swipe_up':
         sh('shell', 'input', 'swipe', '540', '1900', '540', '700', '400')
     elif cmd == 'dump':
