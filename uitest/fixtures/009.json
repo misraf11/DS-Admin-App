@@ -1,0 +1,1 @@
+{"success":true,"user":{"id":1,"name":"Misraf Hossain","email":"admin@test.com","role":"owner"},"store":{"id":1,"name":"DigitalSeba","url":"https://digitalseba.shop","connection_status":"connected","realtime_status":"active","currency":"BDT","last_sync_ts":1792349773,"last_order_sync_ts":1792349833,"last_product_sync_ts":null,"last_webhook_ts":1792349833},"api_version":1}

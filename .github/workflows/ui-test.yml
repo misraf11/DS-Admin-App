@@ -1,0 +1,55 @@
+name: UI test on emulator
+
+on:
+  push:
+    branches: [ uitest ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  emulator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch latest APK
+        run: |
+          git fetch --depth 1 origin apk-builds
+          git show FETCH_HEAD:DS-Admin-latest.apk > /tmp/app.apk
+          ls -la /tmp/app.apk
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Start mock API
+        run: |
+          nohup python3 uitest/mock_server.py > /tmp/mock.log 2>&1 &
+          sleep 2
+          curl -s "http://127.0.0.1:8099/api/mobile.php?action=ping" | head -c 200 || true
+
+      - name: Run app on emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash uitest/run.sh /tmp/app.apk /tmp/shots
+
+      - name: Publish screenshots
+        if: always()
+        run: |
+          mkdir -p /tmp/shots && cd /tmp/shots
+          git init -q -b ui-shots
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -A && git commit -q -m "UI shots ${{ github.run_number }}" || true
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" ui-shots
