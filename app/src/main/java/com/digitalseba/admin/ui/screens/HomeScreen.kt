@@ -104,6 +104,7 @@ fun HomeScreen(nav: Nav) {
                             }
                         }
                     }
+                    item { Spacer(Modifier.height(10.dp)) }
                     if (stats != null) metricGrid(stats, nav)
                     item { Spacer(Modifier.height(4.dp)) }
 

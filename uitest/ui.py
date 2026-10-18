@@ -36,6 +36,12 @@ if __name__ == '__main__':
         if n is None:
             print('NOT FOUND', sys.argv[2]); sys.exit(0)
         tap(*center(n)); print('tapped', sys.argv[2])
+    elif cmd == 'tap_prefix':
+        hits = [n for n in nodes() if (n.get('text') or '').startswith(sys.argv[2])]
+        if hits:
+            tap(*center(hits[0])); print('tapped', hits[0].get('text'))
+        else:
+            print('NOT FOUND prefix', sys.argv[2])
     elif cmd == 'edit':
         idx = int(sys.argv[2])
         eds = [n for n in nodes() if 'EditText' in n.get('class', '')]

@@ -43,11 +43,12 @@ ui swipe_up; shot 06_home_4 2
 ui tap_last "অর্ডার"; shot 07_orders 5
 ui tap "Pending"; shot 08_orders_pending 4
 ui tap "All"; sleep 3
-ui tap "#2430"; shot 09_order_detail 5
+ui tap_prefix "#24"; shot 09_order_detail 5
+ui tap "Status"; shot 12_status_sheet 3
+back
 ui swipe_up; shot 10_order_detail_2 2
 ui swipe_up; shot 11_order_detail_3 2
-ui tap "Status"; shot 12_status_sheet 3
-back; back
+back
 
 ui tap_last "প্রোডাক্ট"; shot 13_products 5
 ui swipe_up; shot 14_products_2 2
@@ -94,7 +95,7 @@ adb shell cmd statusbar collapse
 adb shell cmd uimode night yes
 shot 34_dark_home 5
 ui tap_last "অর্ডার"; shot 35_dark_orders 5
-ui tap "#2430"; shot 36_dark_detail 5
+ui tap_prefix "#24"; shot 36_dark_detail 5
 
 adb logcat -d -b crash > "$OUT/crash.txt" 2>&1
 adb logcat -d | grep -E "AndroidRuntime|FATAL|com.digitalseba" | tail -300 > "$OUT/logcat.txt" 2>&1
