@@ -5,6 +5,9 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -37,3 +40,22 @@ jobs:
           name: DS-Admin-APK
           path: DS-Admin-*.apk
           retention-days: 30
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: DS Admin v1.0.${{ github.run_number }}
+          files: DS-Admin-v1.0.${{ github.run_number }}.apk
+          body: "DS Admin Android app — build ${{ github.run_number }} (${{ github.sha }})"
+
+      - name: Store APK on apk-builds branch
+        run: |
+          mkdir /tmp/apkbranch && cp DS-Admin-*.apk /tmp/apkbranch/DS-Admin-latest.apk
+          cd /tmp/apkbranch
+          git init -q -b apk-builds
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          echo "v1.0.${{ github.run_number }} ${{ github.sha }}" > VERSION.txt
+          git add -A && git commit -q -m "APK build ${{ github.run_number }}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" apk-builds
