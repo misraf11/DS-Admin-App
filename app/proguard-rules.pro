@@ -1,0 +1,12 @@
+-keepattributes *Annotation*, InnerClasses, Signature, EnclosingMethod
+-dontnote kotlinx.serialization.AnnotationsKt
+-keepclassmembers class kotlinx.serialization.json.** { *** Companion; }
+-keepclasseswithmembers class kotlinx.serialization.json.** { kotlinx.serialization.KSerializer serializer(...); }
+-keep,includedescriptorclasses class com.digitalseba.admin.**$$serializer { *; }
+-keepclassmembers class com.digitalseba.admin.** { *** Companion; }
+-keepclasseswithmembers class com.digitalseba.admin.** { kotlinx.serialization.KSerializer serializer(...); }
+-keep class com.digitalseba.admin.data.** { *; }
+-dontwarn okhttp3.internal.platform.**
+-dontwarn org.conscrypt.**
+-dontwarn org.bouncycastle.**
+-dontwarn org.openjsse.**

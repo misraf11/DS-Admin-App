@@ -1,0 +1,39 @@
+name: Build DS Admin APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Build release APK
+        env:
+          VERSION_CODE: ${{ github.run_number }}
+          KEYSTORE_PATH: ${{ github.workspace }}/keystore/ds-admin-release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD || 'jqs85YU92NzMlWUs19cHs1IL' }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD || 'jqs85YU92NzMlWUs19cHs1IL' }}
+          KEY_ALIAS: dsadmin
+        run: gradle assembleRelease --no-daemon --stacktrace
+
+      - name: Rename APK
+        run: cp app/build/outputs/apk/release/app-release.apk DS-Admin-v1.0.${{ github.run_number }}.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DS-Admin-APK
+          path: DS-Admin-*.apk
+          retention-days: 30
